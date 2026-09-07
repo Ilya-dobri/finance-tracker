@@ -1,0 +1,66 @@
+model User {
+    id           String        @id @default(cuid())
+    name         String
+    type         String
+    currency     String        @default("UAH")
+    login        String        @unique
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    email String @unique
+
+    transactions Transaction[]
+    avatar_url   String?
+    password     String
+    @@map("User")
+    sessions     Session[]
+    
+
+    categories Category[]
+    accounts Account[]
+}
+
+model Account {
+   id String @id @default(cuid())
+   name String
+   balance Decimal @default(0)
+   userId String
+   user User @relation(fields: [userId], references: [id])
+   currency String @default("UAH")
+   bankAccountId String
+    provider      String
+
+   transactions Transaction[]
+   @@index([userId])
+}
+
+model Category {
+    id        String   @id @default(cuid())
+    name      String
+    type      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    userId    String
+    
+    user     User  @relation(fields: [userId], references: [id])
+    transactions Transaction[]
+    @@index([userId])
+}
+
+model Transaction {
+    id        String   @id @default(cuid())
+    amount    Decimal
+    type      String
+    createdAt DateTime @default(now())
+    userId    String
+
+    user User @relation(fields: [userId], references: [id])
+    categoryId String
+     category   Category @relation(fields: [categoryId], references: [id])
+
+    accountId String
+    account Account @relation(fields: [accountId], references: [id])
+    @@index([userId])
+}
+
+
+

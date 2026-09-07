@@ -1,0 +1,30 @@
+[
+  {
+    "id": "home",
+    "label": "Home",
+    "icon": "home",
+    "path": "/",
+    "isActive": true
+  },
+  {
+    "id": "cards",
+    "label": "My Cards",
+    "icon": "credit-card",
+    "path": "/cards",
+    "isActive": false
+  },
+  {
+    "id": "statistics",
+    "label": "Statistics",
+    "icon": "pie-chart",
+    "path": "/statistics",
+    "isActive": false
+  },
+  {
+    "id": "settings",
+    "label": "Settings",
+    "icon": "settings",
+    "path": "/settings",
+    "isActive": false
+  }
+]
