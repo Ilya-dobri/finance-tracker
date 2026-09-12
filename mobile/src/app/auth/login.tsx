@@ -2,17 +2,22 @@ import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, Platform } from "react-native";
-export const API_URL = Platform.OS === 'android' 
-      ? 'http://10.0.2.2:3000' 
-      : 'http://localhost:3000';
+export const API_URL =
+  Platform.OS === "android"
+    ? "http://10.0.2.2:3000"
+    : "http://localhost:3000";
 const Page = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleButton = async () => {
-      
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+const handleButton = async () => {
+  try {
+    const url = `${API_URL}/api/auth/login`;
+
+    console.log("➡️ POST:", url);
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -22,24 +27,28 @@ const Page = () => {
         password,
       }),
     });
+
+    console.log("⬅️ STATUS:", response.status);
+
     const data = await response.json();
-    if (response.ok && data.token) {
-      
-      await AsyncStorage.setItem('session_token', data.token);
-    }
+
+    console.log("⬅️ DATA:", data);
+
     if (!response.ok) {
-  console.log(data);
-  return;
-}
-
-
-    if (response.ok) {
-      const targetRoute = data.redirect || data.user?.redirect || '/profile';
-      if (targetRoute) {
-    router.push(targetRoute);
-  }
+      console.log("❌ Login error:", data);
+      return;
     }
-  };
+
+    if (data.token) {
+      await AsyncStorage.setItem("session_token", data.token);
+      console.log("✅ Token saved");
+    }
+
+    router.push(data.redirect || data.user?.redirect || "/profile");
+  } catch (error) {
+    console.error("🔥 FETCH ERROR:", error);
+  }
+};
 
   const handleRegist = () => {
     router.push('/auth/registration');

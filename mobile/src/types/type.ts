@@ -21,3 +21,56 @@ export interface UserAccount {
     type: string;
     id: string;
 }
+export type MonoCardProps = {
+  variant: "SUM";
+  id: string;
+  monoDataFromStore?: MonoData;
+
+  balance: number;
+  currencyCode: number;
+  maskedPan: string[];
+};
+
+export type OtherCardProps = {
+  variant: "OTHER";
+  id: string;
+  balance: number;
+  provider: string;
+  currency: string;
+
+  displayNumber: string | null;
+  displayExpiry: string | null;
+};
+export interface MonoAccount {
+  id: string;
+  balance: number;
+  currencyCode: number;
+  maskedPan: string[];
+  iban: string;
+  type: string;
+  sendId: string;
+  clientId: string;
+  monoDataFromStore?: string
+  // ... інші поля за потреби
+}
+export interface BankAccount {
+  id: string;
+  name: string;
+  provider: string;
+
+  balance: string | number; // Prisma Decimal приходит как строка
+  currency: string;
+
+  bankAccountId: string;
+
+  displayNumber: string | null;
+  displayExpiry: string | null;
+  last4: string | null;
+
+  userId: string;
+}
+export interface MonoData {
+  clientId?: string;
+  name?: string;
+  accounts: MonoAccount[];
+}

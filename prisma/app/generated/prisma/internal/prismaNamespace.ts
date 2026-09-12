@@ -864,7 +864,10 @@ export const AccountScalarFieldEnum = {
   userId: 'userId',
   currency: 'currency',
   bankAccountId: 'bankAccountId',
-  provider: 'provider'
+  provider: 'provider',
+  displayNumber: 'displayNumber',
+  displayExpiry: 'displayExpiry',
+  last4: 'last4'
 } as const
 
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
@@ -888,8 +891,11 @@ export const TransactionScalarFieldEnum = {
   type: 'type',
   createdAt: 'createdAt',
   userId: 'userId',
+  description: 'description',
   categoryId: 'categoryId',
-  accountId: 'accountId'
+  dedupeHash: 'dedupeHash',
+  accountId: 'accountId',
+  date: 'date'
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]

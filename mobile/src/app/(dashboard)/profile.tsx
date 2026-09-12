@@ -7,7 +7,7 @@ import { API_URL } from "../auth/login";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Page = () => {
- 
+  
 
 
   return (

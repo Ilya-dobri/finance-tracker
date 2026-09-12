@@ -42,6 +42,9 @@ export type AccountMinAggregateOutputType = {
   currency: string | null
   bankAccountId: string | null
   provider: string | null
+  displayNumber: string | null
+  displayExpiry: string | null
+  last4: string | null
 }
 
 export type AccountMaxAggregateOutputType = {
@@ -52,6 +55,9 @@ export type AccountMaxAggregateOutputType = {
   currency: string | null
   bankAccountId: string | null
   provider: string | null
+  displayNumber: string | null
+  displayExpiry: string | null
+  last4: string | null
 }
 
 export type AccountCountAggregateOutputType = {
@@ -62,6 +68,9 @@ export type AccountCountAggregateOutputType = {
   currency: number
   bankAccountId: number
   provider: number
+  displayNumber: number
+  displayExpiry: number
+  last4: number
   _all: number
 }
 
@@ -82,6 +91,9 @@ export type AccountMinAggregateInputType = {
   currency?: true
   bankAccountId?: true
   provider?: true
+  displayNumber?: true
+  displayExpiry?: true
+  last4?: true
 }
 
 export type AccountMaxAggregateInputType = {
@@ -92,6 +104,9 @@ export type AccountMaxAggregateInputType = {
   currency?: true
   bankAccountId?: true
   provider?: true
+  displayNumber?: true
+  displayExpiry?: true
+  last4?: true
 }
 
 export type AccountCountAggregateInputType = {
@@ -102,6 +117,9 @@ export type AccountCountAggregateInputType = {
   currency?: true
   bankAccountId?: true
   provider?: true
+  displayNumber?: true
+  displayExpiry?: true
+  last4?: true
   _all?: true
 }
 
@@ -199,6 +217,9 @@ export type AccountGroupByOutputType = {
   currency: string
   bankAccountId: string
   provider: string
+  displayNumber: string | null
+  displayExpiry: string | null
+  last4: string | null
   _count: AccountCountAggregateOutputType | null
   _avg: AccountAvgAggregateOutputType | null
   _sum: AccountSumAggregateOutputType | null
@@ -232,6 +253,9 @@ export type AccountWhereInput = {
   currency?: Prisma.StringFilter<"Account"> | string
   bankAccountId?: Prisma.StringFilter<"Account"> | string
   provider?: Prisma.StringFilter<"Account"> | string
+  displayNumber?: Prisma.StringNullableFilter<"Account"> | string | null
+  displayExpiry?: Prisma.StringNullableFilter<"Account"> | string | null
+  last4?: Prisma.StringNullableFilter<"Account"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   transactions?: Prisma.TransactionListRelationFilter
 }
@@ -244,12 +268,16 @@ export type AccountOrderByWithRelationInput = {
   currency?: Prisma.SortOrder
   bankAccountId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
+  displayNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
+  last4?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   transactions?: Prisma.TransactionOrderByRelationAggregateInput
 }
 
 export type AccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  userId_provider_last4?: Prisma.AccountUserIdProviderLast4CompoundUniqueInput
   AND?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   OR?: Prisma.AccountWhereInput[]
   NOT?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
@@ -259,9 +287,12 @@ export type AccountWhereUniqueInput = Prisma.AtLeast<{
   currency?: Prisma.StringFilter<"Account"> | string
   bankAccountId?: Prisma.StringFilter<"Account"> | string
   provider?: Prisma.StringFilter<"Account"> | string
+  displayNumber?: Prisma.StringNullableFilter<"Account"> | string | null
+  displayExpiry?: Prisma.StringNullableFilter<"Account"> | string | null
+  last4?: Prisma.StringNullableFilter<"Account"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   transactions?: Prisma.TransactionListRelationFilter
-}, "id">
+}, "id" | "userId_provider_last4">
 
 export type AccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -271,6 +302,9 @@ export type AccountOrderByWithAggregationInput = {
   currency?: Prisma.SortOrder
   bankAccountId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
+  displayNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
+  last4?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AccountCountOrderByAggregateInput
   _avg?: Prisma.AccountAvgOrderByAggregateInput
   _max?: Prisma.AccountMaxOrderByAggregateInput
@@ -289,6 +323,9 @@ export type AccountScalarWhereWithAggregatesInput = {
   currency?: Prisma.StringWithAggregatesFilter<"Account"> | string
   bankAccountId?: Prisma.StringWithAggregatesFilter<"Account"> | string
   provider?: Prisma.StringWithAggregatesFilter<"Account"> | string
+  displayNumber?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  displayExpiry?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  last4?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
 }
 
 export type AccountCreateInput = {
@@ -298,6 +335,9 @@ export type AccountCreateInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
   user: Prisma.UserCreateNestedOneWithoutAccountsInput
   transactions?: Prisma.TransactionCreateNestedManyWithoutAccountInput
 }
@@ -310,6 +350,9 @@ export type AccountUncheckedCreateInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutAccountInput
 }
 
@@ -320,6 +363,9 @@ export type AccountUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutAccountsNestedInput
   transactions?: Prisma.TransactionUpdateManyWithoutAccountNestedInput
 }
@@ -332,6 +378,9 @@ export type AccountUncheckedUpdateInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutAccountNestedInput
 }
 
@@ -343,6 +392,9 @@ export type AccountCreateManyInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
 }
 
 export type AccountUpdateManyMutationInput = {
@@ -352,6 +404,9 @@ export type AccountUpdateManyMutationInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AccountUncheckedUpdateManyInput = {
@@ -362,6 +417,9 @@ export type AccountUncheckedUpdateManyInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AccountListRelationFilter = {
@@ -374,6 +432,12 @@ export type AccountOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type AccountUserIdProviderLast4CompoundUniqueInput = {
+  userId: string
+  provider: string
+  last4: string
+}
+
 export type AccountCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -382,6 +446,9 @@ export type AccountCountOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   bankAccountId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
+  displayNumber?: Prisma.SortOrder
+  displayExpiry?: Prisma.SortOrder
+  last4?: Prisma.SortOrder
 }
 
 export type AccountAvgOrderByAggregateInput = {
@@ -396,6 +463,9 @@ export type AccountMaxOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   bankAccountId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
+  displayNumber?: Prisma.SortOrder
+  displayExpiry?: Prisma.SortOrder
+  last4?: Prisma.SortOrder
 }
 
 export type AccountMinOrderByAggregateInput = {
@@ -406,6 +476,9 @@ export type AccountMinOrderByAggregateInput = {
   currency?: Prisma.SortOrder
   bankAccountId?: Prisma.SortOrder
   provider?: Prisma.SortOrder
+  displayNumber?: Prisma.SortOrder
+  displayExpiry?: Prisma.SortOrder
+  last4?: Prisma.SortOrder
 }
 
 export type AccountSumOrderByAggregateInput = {
@@ -488,6 +561,9 @@ export type AccountCreateWithoutUserInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
   transactions?: Prisma.TransactionCreateNestedManyWithoutAccountInput
 }
 
@@ -498,6 +574,9 @@ export type AccountUncheckedCreateWithoutUserInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
   transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutAccountInput
 }
 
@@ -538,6 +617,9 @@ export type AccountScalarWhereInput = {
   currency?: Prisma.StringFilter<"Account"> | string
   bankAccountId?: Prisma.StringFilter<"Account"> | string
   provider?: Prisma.StringFilter<"Account"> | string
+  displayNumber?: Prisma.StringNullableFilter<"Account"> | string | null
+  displayExpiry?: Prisma.StringNullableFilter<"Account"> | string | null
+  last4?: Prisma.StringNullableFilter<"Account"> | string | null
 }
 
 export type AccountCreateWithoutTransactionsInput = {
@@ -547,6 +629,9 @@ export type AccountCreateWithoutTransactionsInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
   user: Prisma.UserCreateNestedOneWithoutAccountsInput
 }
 
@@ -558,6 +643,9 @@ export type AccountUncheckedCreateWithoutTransactionsInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
 }
 
 export type AccountCreateOrConnectWithoutTransactionsInput = {
@@ -583,6 +671,9 @@ export type AccountUpdateWithoutTransactionsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutAccountsNestedInput
 }
 
@@ -594,6 +685,9 @@ export type AccountUncheckedUpdateWithoutTransactionsInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AccountCreateManyUserInput = {
@@ -603,6 +697,9 @@ export type AccountCreateManyUserInput = {
   currency?: string
   bankAccountId: string
   provider: string
+  displayNumber?: string | null
+  displayExpiry?: string | null
+  last4?: string | null
 }
 
 export type AccountUpdateWithoutUserInput = {
@@ -612,6 +709,9 @@ export type AccountUpdateWithoutUserInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactions?: Prisma.TransactionUpdateManyWithoutAccountNestedInput
 }
 
@@ -622,6 +722,9 @@ export type AccountUncheckedUpdateWithoutUserInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transactions?: Prisma.TransactionUncheckedUpdateManyWithoutAccountNestedInput
 }
 
@@ -632,6 +735,9 @@ export type AccountUncheckedUpdateManyWithoutUserInput = {
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   bankAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   provider?: Prisma.StringFieldUpdateOperationsInput | string
+  displayNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayExpiry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  last4?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -673,6 +779,9 @@ export type AccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   currency?: boolean
   bankAccountId?: boolean
   provider?: boolean
+  displayNumber?: boolean
+  displayExpiry?: boolean
+  last4?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   transactions?: boolean | Prisma.Account$transactionsArgs<ExtArgs>
   _count?: boolean | Prisma.AccountCountOutputTypeDefaultArgs<ExtArgs>
@@ -686,6 +795,9 @@ export type AccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   currency?: boolean
   bankAccountId?: boolean
   provider?: boolean
+  displayNumber?: boolean
+  displayExpiry?: boolean
+  last4?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -697,6 +809,9 @@ export type AccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   currency?: boolean
   bankAccountId?: boolean
   provider?: boolean
+  displayNumber?: boolean
+  displayExpiry?: boolean
+  last4?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["account"]>
 
@@ -708,9 +823,12 @@ export type AccountSelectScalar = {
   currency?: boolean
   bankAccountId?: boolean
   provider?: boolean
+  displayNumber?: boolean
+  displayExpiry?: boolean
+  last4?: boolean
 }
 
-export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "balance" | "userId" | "currency" | "bankAccountId" | "provider", ExtArgs["result"]["account"]>
+export type AccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "balance" | "userId" | "currency" | "bankAccountId" | "provider" | "displayNumber" | "displayExpiry" | "last4", ExtArgs["result"]["account"]>
 export type AccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   transactions?: boolean | Prisma.Account$transactionsArgs<ExtArgs>
@@ -737,6 +855,9 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     currency: string
     bankAccountId: string
     provider: string
+    displayNumber: string | null
+    displayExpiry: string | null
+    last4: string | null
   }, ExtArgs["result"]["account"]>
   composites: {}
 }
@@ -1169,6 +1290,9 @@ export interface AccountFieldRefs {
   readonly currency: Prisma.FieldRef<"Account", 'String'>
   readonly bankAccountId: Prisma.FieldRef<"Account", 'String'>
   readonly provider: Prisma.FieldRef<"Account", 'String'>
+  readonly displayNumber: Prisma.FieldRef<"Account", 'String'>
+  readonly displayExpiry: Prisma.FieldRef<"Account", 'String'>
+  readonly last4: Prisma.FieldRef<"Account", 'String'>
 }
     
 
