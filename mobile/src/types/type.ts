@@ -30,7 +30,13 @@ export type MonoCardProps = {
   currencyCode: number;
   maskedPan: string[];
 };
-
+export type BankNotification = {
+  id: string;
+  packageName: string;
+  title: string | null;
+  text: string | null;
+  timestamp: number;
+};
 export type OtherCardProps = {
   variant: "OTHER";
   id: string;
@@ -55,12 +61,13 @@ export interface MonoAccount {
 }
 export interface BankAccount {
   id: string;
+  type?: string
   name: string;
   provider: string;
-
+  amount?: string
   balance: string | number; // Prisma Decimal приходит как строка
   currency: string;
-
+description?:string
   bankAccountId: string;
 
   displayNumber: string | null;

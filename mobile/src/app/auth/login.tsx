@@ -1,12 +1,13 @@
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Platform } from "react-native";
+import { View, Text, TextInput, Pressable, Platform, Keyboard } from "react-native";
 export const API_URL =
-  Platform.OS === "android"
-    ? "http://10.0.2.2:3000"
-    : "http://localhost:3000";
-const Page = () => {
+  Platform.OS === "web"
+    ? "http://localhost:3000"
+    : "http://192.168.0.140:3000";
+    
+    const Page = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,10 +53,13 @@ const handleButton = async () => {
 
   const handleRegist = () => {
     router.push('/auth/registration');
+    Keyboard.dismiss()
+
   };
 
   return (
-    <View className="flex-1 justify-center items-center bg-gray-100">
+    <Pressable onPress={Keyboard.dismiss}
+  className="flex-1 justify-center items-center bg-gray-100">
       <View className="w-[335px] p-4 rounded-[32px] bg-white/80 shadow-lg">
         <View className="w-full rounded-[26px] bg-gray-50 p-10 justify-center">
           <View className="items-center mb-14">
@@ -83,6 +87,7 @@ const handleButton = async () => {
             <View className="flex flex-col gap-2">
               <Text className="text-sm font-semibold text-gray-700">Password</Text>
               <TextInput
+                
                 placeholder="Введите пароль"
                 secureTextEntry
                 className="w-full h-12 px-5 rounded-2xl border border-gray-200 bg-white text-gray-800"
@@ -106,14 +111,14 @@ const handleButton = async () => {
 
             <View className="flex-row justify-center gap-1">
               <Text className="text-sm text-gray-500">Нет аккаунта?</Text>
-              <Pressable onPress={handleRegist}>
+              <Pressable  onPress={handleRegist}>
                 <Text className="font-semibold text-[#FF7E3A]">Зарегистрироваться</Text>
               </Pressable>
             </View>
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

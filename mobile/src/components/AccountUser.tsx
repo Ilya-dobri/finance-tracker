@@ -1,41 +1,39 @@
-import React, {
-  use,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Pressable,
   Image as RNImage,
   Dimensions,
 } from "react-native";
 import { QuickActionsMenu } from "./QuickActionsMenu";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Svg, { Path } from "react-native-svg";
+
 import { CreditCardIcon } from "lucide-react-native";
-import { API_URL } from "@/app/auth/login";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import MenuAddCard from "./MenuAddCard";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { MonoAccount, MonoCardProps, MonoData, MonoStatement, OtherCardProps } from "@/types/type";
-import { useStore } from "zustand";
+
+import {
+  MonoAccount,
+  MonoCardProps,
+  MonoData,
+  OtherCardProps,
+} from "@/types/type";
+
 import { useAccountStore, useStatementStore } from "./store/useStatementStore";
 import { getLogoForTx } from "./getIconForTx";
 import { Carousel } from "react-native-reanimated-carousel";
-import { useFocusEffect, usePathname } from "expo-router";
+import type { BottomSheetModal } from "@gorhom/bottom-sheet";
+
 import MonoCarta from "./MonoCarta";
+import { syncNotifications } from "./services/notifications/syncNotifications";
+import { getBankTransactionIcon } from "./getBankTransactionImage";
+
 
 export type MonoAccountsResponse = MonoData | MonoAccount[];
 
-
 export type CardProps = MonoCardProps | OtherCardProps;
 const AccountUser: React.FC = () => {
-  const cardMenuRef = useRef<BottomSheetModal>(null);
+  const cardMenuRef = useRef<BottomSheetModal | null>(null);
   const getCardStatement = useStatementStore(
     (state) => state.getCardStatementMono,
   );
@@ -52,17 +50,21 @@ const AccountUser: React.FC = () => {
   const setSelectedAccountId = useAccountStore(
     (state) => state.setSelectedAccountId,
   );
+  const [activeCardId, setActiveCardId] =
+  useState<string | null>(null);
+  const BankOtherDataFromStore = useAccountStore((state) => state.bankData);
+
   const [activeCardVariant, setActiveCardVariant] = useState<"SUM" | "OTHER">(
     "SUM",
   );
-  const BankOtherDataFromStore = useAccountStore((state) => state.bankData);
   useEffect(() => {
     fetchMonobank();
     fetchOtherBank();
+
   }, []);
   const cards: CardProps[] = useMemo(() => {
     const monoCards =
-      monoDataFromStore?.accounts?.map((account:MonoAccount) => ({
+      monoDataFromStore?.accounts?.map((account: MonoAccount) => ({
         variant: "SUM" as const,
         id: account.id,
 
@@ -89,14 +91,44 @@ const AccountUser: React.FC = () => {
     return [...monoCards, ...otherCards];
   }, [monoDataFromStore, BankOtherDataFromStore]);
 
-  useEffect(() => {
-    const accountId =
-      monoDataFromStore?.accounts?.[0]?.id || BankOtherDataFromStore?.[0]?.id;
-    if (!accountId) return;
 
-    getCardStatement(accountId);
-    getCardStatementBank(accountId);
-  }, [monoDataFromStore, BankOtherDataFromStore]);
+
+  useEffect(() => {
+    const monoAccountId = monoDataFromStore?.accounts?.[0]?.id;
+
+    const otherAccountId = BankOtherDataFromStore?.[0]?.id;
+
+    if (monoAccountId) {
+      getCardStatement(monoAccountId);
+    }
+
+    if (otherAccountId) {
+      getCardStatementBank(otherAccountId);
+    }
+  }, [
+    monoDataFromStore,
+    BankOtherDataFromStore,
+    getCardStatement,
+    getCardStatementBank,
+  ]);
+const handleCardChange = async (index: number) => {
+  const activeCard = cards[index];
+
+  if (!activeCard) return;
+
+  setActiveCardVariant(activeCard.variant);
+  setActiveCardId(activeCard.id);
+  setSelectedAccountId(activeCard.id);
+
+  if (activeCard.variant === "SUM") {
+    await getCardStatement(activeCard.id);
+    return;
+  }
+
+  await syncNotifications(activeCard.id);
+
+  await getCardStatementBank(activeCard.id);
+};
 
   return (
     <View className="">
@@ -127,17 +159,7 @@ const AccountUser: React.FC = () => {
                 height: 240,
               }}
               onSnapToItem={(index: number) => {
-                const activeCard = cards[index];
-
-                if (!activeCard) return;
-
-                setActiveCardVariant(activeCard.variant);
-
-                if (activeCard.variant === "SUM") {
-                  getCardStatement(activeCard.id);
-                } else {
-                  getCardStatementBank(activeCard.id);
-                }
+               void handleCardChange(index)
               }}
               data={cards}
               renderItem={({ item }) => {
@@ -212,16 +234,27 @@ const AccountUser: React.FC = () => {
               })}
 
             {activeCardVariant === "OTHER" &&
-              statementBankAnt.slice(0, 4).map((item) => (
-                <View
+              statementBankAnt.slice(0, 4).map((item) => {
+                const icon = getBankTransactionIcon({
+                  description: item.description ?? "",
+                  type: (item.type ?? "") as Parameters<
+                    typeof getBankTransactionIcon
+                  >[0]["type"],
+                });
+                return(<View
                   key={item.id}
                   className="h-[42px] flex-row w-full justify-between p-[5px] items-center"
                 >
-                  <Text className="text-white">{"Транзакция"}</Text>
+                   <View className="flex-row items-center flex gap-5">
+                       {icon}
+                  <Text className="text-white">{item.description}</Text>
 
-                  <Text className="text-white">{Number(item.balance)} ₴</Text>
-                </View>
-              ))}
+                   </View>
+
+                  <Text className="text-white"> {Number(item.amount)} ₴</Text>
+                </View>)
+                
+})}
           </View>
         </View>
       )}
@@ -233,4 +266,4 @@ const AccountUser: React.FC = () => {
   );
 };
 
-export default AccountUser;
+export default AccountUser

@@ -55,7 +55,7 @@ export const useStatementStore = create<Store>((set,get) => ({
       }
 
       const data = await response.json();
-      console.log("Monobank statement:", data);
+     
         if (isSameStatement(get().statementMono as MonoStatement[], data)) return;
       set({ statementMono: data, lastAccountId: accountId });
     } catch (error) {
@@ -123,7 +123,7 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
         const data: MonoAccountsResponse = await response.json();
          
         if (!Array.isArray(data) && Array.isArray(data.accounts)) {
-          console.log("Monobank accounts:", data);
+          
           
           set({ monoData: data });
         } else if (Array.isArray(data)) {
@@ -134,6 +134,8 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
       }
     },
     setSelectedAccountId: (id) => set({ selectedAccountId: id }),
+
+    
     fetchOtherBank: async () => {
       if (get().isLoading) return;
      const token = await AsyncStorage.getItem("session_token");

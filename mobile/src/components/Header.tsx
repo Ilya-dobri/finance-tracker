@@ -28,7 +28,7 @@ const Header = () => {
 
   return (
     <View>
-      <View className="mt-[10px] mx-[20px]">
+      <View className="mt-[50px] mx-[20px]">
         <View className="flex-row items-center justify-between">
           
           {/* Левая часть */}
