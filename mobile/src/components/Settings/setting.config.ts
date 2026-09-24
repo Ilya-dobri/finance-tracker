@@ -7,11 +7,12 @@ export interface SettingSection {
   title: string;
   type: 'switch' | 'link';
   value?: string;
+  route?: string
 }
 
 export const SETTINGS_SECTIONS: SettingSection[] = [
   
-  { id: 'profile', title: 'My Profile', type: 'link' },
+  { id: 'profile', title: 'My Profile', type: 'link', route: 'MyProfile' },
   { id: 'contact', title: 'Contact Us', type: 'link' },
 { id: 'Password', title: 'Change Password', type: 'link' },
   { id: 'Privacy', title: 'Privacy Policy', type: 'link' },

@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Защита страниц
+
   const token = request.cookies.get("session_token")?.value;
 
   if (!token) {

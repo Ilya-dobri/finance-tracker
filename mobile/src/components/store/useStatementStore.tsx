@@ -97,6 +97,7 @@ interface AccountStore {
   setSelectedAccountId: (id: string) => void;
   selectedAccountId: any;
   bankData: BankAccount[] | null;
+  deleteCartOutBank: (deleteId: number) => void
 }
 
 
@@ -134,7 +135,10 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
       }
     },
     setSelectedAccountId: (id) => set({ selectedAccountId: id }),
-
+   
+    deleteCartOutBank: async () => {
+      const token = await AsyncStorage.getItem
+    },
     
     fetchOtherBank: async () => {
       if (get().isLoading) return;

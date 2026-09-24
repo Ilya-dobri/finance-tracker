@@ -13,10 +13,7 @@ const CardUser = () => {
   const selectedAccountId = useAccountStore((state) => state.selectedAccountId);
   const fetchOtherBank = useAccountStore((state) => state.fetchOtherBank)
   const otherBankDataFromStore = useAccountStore((state) => state.bankData)
-  useEffect(() => {
-    fetchMonobank();
-  
-  });
+
 
 
 
@@ -37,7 +34,7 @@ const CardUser = () => {
           return (
             <MonoCarta
 
-              variant={"UNSUMM"}
+              variant={"CardList"}
               key={mono.id}
               monoDataFromStore={monoDataFromStore}
               balance={mono.balance}

@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState } from "react";
+import  { useState } from "react";
 import { View, Text, TextInput, Pressable, Platform, Keyboard } from "react-native";
 export const API_URL =
   Platform.OS === "web"
@@ -8,7 +8,7 @@ export const API_URL =
     : "http://192.168.0.140:3000";
     
     const Page = () => {
-  const router = useRouter();
+ const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

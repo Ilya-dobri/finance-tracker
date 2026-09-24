@@ -1,12 +1,13 @@
 import { MonoData } from '@/types/type'
+import { Trash } from 'lucide-react-native';
 import React from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 export type MonoAccountsResponse = {
   monoDataFromStore?: MonoData;
   balance?: number;
   currencyCode: number;
   maskedPan: string[];
-  variant?: "SUM" | "UNSUMM" | "OTHER";
+  variant?: "SUM" | "CardList" | "OTHER";
    provider?: string;
   displayNumber?: string | null;
   displayExpiry?: string | null;
@@ -54,13 +55,18 @@ const MonoCarta = ({  variant,
       </View>
       )}
 
-      {variant === 'UNSUMM' && (
-        <View className="flex items-center justify-center w-full">
+      {variant === 'CardList' && (
+        <View className="relative flex items-center justify-center w-full">
+          <Pressable className="p-1.5 rounded-[10px] bg-[#3A2024]
+    border border-[#6B2A32] absolute top-6 right-12 z-10">
+      <Trash color="#F07A84" size={20} />
+    </Pressable>
           <View
             id="card"
             className="relative p-[23px] h-[199px] w-[335px] justify-between flex flex-col rounded-[28px]"
             style={{ backgroundColor: "#1c1c1f" }}
           >
+            
             <Text className="font-bold tracking-[2px] text-[18px] text-white">
               monobank
             </Text>
