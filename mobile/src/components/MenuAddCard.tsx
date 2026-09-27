@@ -21,6 +21,7 @@ import {
 import { ChevronRight, CreditCardIcon, Key } from "lucide-react-native";
 import { API_URL } from "@/app/auth/login";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAccountStore } from "./store/useStatementStore";
 
 interface MenuAddCardProps {
   onClose: () => void;
@@ -58,12 +59,19 @@ const MenuAddCard = forwardRef<BottomSheetModal, MenuAddCardProps>(
     const [isvisible, setIsVisible] = useState(false);
     const [bankKey, setBankKey] = useState("");
     const [bank, setBank] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const menuProgress = useSharedValue(0);
     const menuAnimatedStyle = useAnimatedStyle(() => ({
       opacity: menuProgress.value,
       transform: [{ translateY: (1 - menuProgress.value) * -8 }],
     }));
+const fetchOtherBank = useAccountStore(
+  (state) => state.fetchOtherBank
+);
 
+const fetchMonobank = useAccountStore(
+  (state) => state.fetchMonobank
+);
     const changeBank = (text: string) => {
       setBank(text);
       setIsVisible(false);
@@ -93,14 +101,23 @@ const MenuAddCard = forwardRef<BottomSheetModal, MenuAddCardProps>(
       setCVV(formatted);
     };
     const sendDataBank = async () => {
-        if (!bank) {
+  if (isSubmitting) return;
+
+  if (!bank) {
     console.error("Сначала выберите банк");
     return;
   }
-  if (bank === "monobank") {
-    await sendMonobank();
-  } else {
-    await sendOtherBank();
+
+  setIsSubmitting(true);
+
+  try {
+    if (bank === "monobank") {
+      await sendMonobank();
+    } else {
+      await sendOtherBank();
+    }
+  } finally {
+    setIsSubmitting(false);
   }
 };
     const sendMonobank = async () => {
@@ -128,6 +145,9 @@ const MenuAddCard = forwardRef<BottomSheetModal, MenuAddCardProps>(
         if (response.ok) {
           console.log(data);
           internalRef.current?.dismiss();
+           await fetchOtherBank();
+  await fetchMonobank();
+
         } else {
           console.error("Error sending bank data:", response.status, data);
         }
@@ -159,7 +179,10 @@ const MenuAddCard = forwardRef<BottomSheetModal, MenuAddCardProps>(
 
         const data = await response.json();
         if (response.ok) {
+          
           console.log(data);
+            await fetchOtherBank();
+  await fetchMonobank();
           internalRef.current?.dismiss();
         } else {
           console.error("Error sending bank data:", response.status, data);

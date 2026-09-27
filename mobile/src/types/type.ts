@@ -22,7 +22,7 @@ export interface UserAccount {
     id: string;
 }
 export type MonoCardProps = {
-  variant: "SUM";
+  variant: "MONOBANK_SUM";
   id: string;
   monoDataFromStore?: MonoData;
 
@@ -48,7 +48,7 @@ export type OtherCardProps = {
   displayExpiry: string | null;
 };
 export interface MonoAccount {
-  id: string;
+  id?: string;
   balance: number;
   currencyCode: number;
   maskedPan: string[];
@@ -65,6 +65,7 @@ export interface BankAccount {
   name: string;
   provider: string;
   amount?: string
+  date?: string
   balance: string | number; // Prisma Decimal приходит как строка
   currency: string;
 description?:string

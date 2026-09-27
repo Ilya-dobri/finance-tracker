@@ -4,17 +4,15 @@ import { BankAccount, MonoStatement } from "@/types/type";
 import { API_URL } from "@/app/auth/login";
 import { MonoAccountsResponse } from "../AccountUser";
 
-
-
 interface Store {
   state: string;
-  isLoading:boolean
+  isLoading: boolean;
   setState: (state: string) => void;
-  statementMono: MonoStatement[] 
-  statementBank:BankAccount[]
-lastAccountId: string | null;
+  statementMono: MonoStatement[];
+  statementBank: BankAccount[];
+  lastAccountId: string | null;
   getCardStatementMono: (accountId: string) => Promise<void>;
-  getCartAnotherBankStatement: (accountId: string) => Promise<void>
+  getCartAnotherBankStatement: (accountId: string) => Promise<void>;
 }
 function isSameStatement(a: MonoStatement[], b: MonoStatement[]) {
   if (a.length !== b.length) return false;
@@ -24,7 +22,7 @@ function isSameStatement(a: MonoStatement[], b: MonoStatement[]) {
   return true;
 }
 
-export const useStatementStore = create<Store>((set,get) => ({
+export const useStatementStore = create<Store>((set, get) => ({
   state: "",
   statementMono: [],
   statementBank: [],
@@ -33,8 +31,9 @@ export const useStatementStore = create<Store>((set,get) => ({
   setState: (state) => set({ state }),
 
   async getCardStatementMono(accountId: string) {
-   if (!accountId || get().isLoading) return;
-   if (get().lastAccountId === accountId && get().statementMono.length > 0) return;
+    if (!accountId || get().isLoading) return;
+    if (get().lastAccountId === accountId && get().statementMono.length > 0)
+      return;
     const token = await AsyncStorage.getItem("session_token");
     if (!token || !accountId) return;
 
@@ -55,8 +54,8 @@ export const useStatementStore = create<Store>((set,get) => ({
       }
 
       const data = await response.json();
-     
-        if (isSameStatement(get().statementMono as MonoStatement[], data)) return;
+
+      if (isSameStatement(get().statementMono as MonoStatement[], data)) return;
       set({ statementMono: data, lastAccountId: accountId });
     } catch (error) {
       console.error("Fetch error:", error);
@@ -64,30 +63,32 @@ export const useStatementStore = create<Store>((set,get) => ({
   },
 
   getCartAnotherBankStatement: async (accountId: string) => {
-    const token = await AsyncStorage.getItem('session_token')
+    const token = await AsyncStorage.getItem("session_token");
     if (!token) return;
     try {
-      const response = await fetch(`${API_URL}/api/accounts/${accountId}/transactions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${API_URL}/api/accounts/${accountId}/transactions`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      })
-       if (!response.ok) {
-      throw new Error(`Ошибка: ${response.status}`);
-    }
-    const data: BankAccount[] = await response.json();
-    set({statementBank: data})
+      );
+      if (!response.ok) {
+        throw new Error(`Ошибка: ${response.status}`);
+      }
+      const data: BankAccount[] = await response.json();
+      set({ statementBank: data });
     } catch (error) {
-    console.error(error);
+      console.error(error);
 
-    set({
-      statementBank: [],
-    });
+      set({
+        statementBank: [],
+      });
     }
-  }
+  },
 }));
-
 
 interface AccountStore {
   monoData: any;
@@ -97,9 +98,8 @@ interface AccountStore {
   setSelectedAccountId: (id: string) => void;
   selectedAccountId: any;
   bankData: BankAccount[] | null;
-  deleteCartOutBank: (deleteId: number) => void
+  deleteCartOutBank: (deleteId: string) => void;
 }
-
 
 export const useAccountStore = create<AccountStore>((set, get) => ({
   monoData: null,
@@ -107,59 +107,88 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
   isLoading: false,
   selectedAccountId: null,
   fetchMonobank: async () => {
-   if (get().isLoading || get().monoData) return;
-     const token = await AsyncStorage.getItem("session_token");
-      if (!token) return;
+    if (get().isLoading ) return;
+    const token = await AsyncStorage.getItem("session_token");
+    if (!token) return;
 
-      try {
-        const response = await fetch(`${API_URL}/api/accounts/mono`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    try {
+      const response = await fetch(`${API_URL}/api/accounts/mono`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (!response.ok) {
-         set({ monoData: { accounts: [] } });
-          return;
-        }
-
-        const data: MonoAccountsResponse = await response.json();
-         
-        if (!Array.isArray(data) && Array.isArray(data.accounts)) {
-          
-          
-          set({ monoData: data });
-        } else if (Array.isArray(data)) {
-          set({ monoData: { accounts: data } });
-        }
-      } catch (error) {
-        console.error("Failed to load accounts:", error);
+      if (!response.ok) {
+        set({ monoData: { accounts: [] } });
+        return;
       }
-    },
-    setSelectedAccountId: (id) => set({ selectedAccountId: id }),
-   
-    deleteCartOutBank: async () => {
-      const token = await AsyncStorage.getItem
-    },
+
+      const data: MonoAccountsResponse = await response.json();
+
+      if (!Array.isArray(data) && Array.isArray(data.accounts)) {
+        set({ monoData: data });
+      } else if (Array.isArray(data)) {
+        set({ monoData: { accounts: data } });
+      }
+    } catch (error) {
+      console.error("Failed to load accounts:", error);
+    }
+  },
+  setSelectedAccountId: (id) => set({ selectedAccountId: id }),
+
+  deleteCartOutBank: async (deleteId) => {
+    const token = await AsyncStorage.getItem("session_token");
+    if (!token) return;
+     set({ isLoading: true });
+    try {
+      
+       const response = await fetch(
+      `${API_URL}/api/accounts/${encodeURIComponent(deleteId)}`,
+      
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     
-    fetchOtherBank: async () => {
-      if (get().isLoading) return;
-     const token = await AsyncStorage.getItem("session_token");
-      if (!token) return;
-      try {
-        const response = await fetch(`${API_URL}/api/accounts`,{
-            method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-        })
-        const data:  BankAccount[]= await response.json();
-        set({ bankData: data });
-      } catch (error) {
-        console.error("Failed to load accounts:", error);
-      }
-  }
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to delete account");
+    }
 
+    await get().fetchOtherBank();
+    await get().fetchMonobank()
+         set((state) => ({
+  bankData: state.bankData?.filter(
+    (account) => account.id !== deleteId
+  ) ?? [],
+}));
+    } catch (error) {
+      console.error("Failed to load accounts:", error);
+    }finally {
+    set({ isLoading: false });
+  }
+  },
+
+  fetchOtherBank: async () => {
+    if (get().isLoading) return;
+    const token = await AsyncStorage.getItem("session_token");
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_URL}/api/accounts`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      
+      const data: BankAccount[] = await response.json();
+      set({ bankData: data });
+    } catch (error) {
+      console.error("Failed to load accounts:", error);
     }
     
-  
-));
+  },
+}));

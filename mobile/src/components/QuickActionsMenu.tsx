@@ -6,6 +6,7 @@ import {
   Search,
   RefreshCw,
 } from "lucide-react-native";
+import { useAccountStore } from "./store/useStatementStore";
 
 type ActivButton = {
   refresh: () => void;
@@ -13,14 +14,22 @@ type ActivButton = {
   analytics: () => void
 };
 
-export const QuickActionsMenu = ({ refresh, analytics }: ActivButton) => {
+export const QuickActionsMenu = ({add, refresh, analytics }: ActivButton) => {
+   const BankOtherDataFromStore = useAccountStore((state) => state.bankData);
+
+    const selectedAccountId  = useAccountStore((state) => state.selectedAccountId);
+    const selectedAccount = BankOtherDataFromStore?.find((account) => account.id === selectedAccountId)
+
   return (
     <View className="flex-row justify-evenly gap-[16px] w-full p-4">
 
     
       <Pressable
-       
-        className="flex-col items-center gap-[8px]"
+        onPress={add}
+        disabled={!selectedAccount}
+        className={`flex-col items-center gap-[8px] ${
+    selectedAccount ? "  " : "opacity-40 disabled"
+  }`}
       >
         <View className="bg-[#1E1E2D] rounded-3xl w-[54px] h-[54px] items-center justify-center">
           <Plus size={24} color="#FFA66B" />
@@ -34,7 +43,7 @@ export const QuickActionsMenu = ({ refresh, analytics }: ActivButton) => {
       
       <Pressable
         onPress={analytics}
-        className="flex-col items-center gap-[8px]"
+       className="flex-col items-center gap-[8px]"
       >
         <View className="bg-[#1E1E2D] rounded-3xl w-[54px] h-[54px] items-center justify-center">
           <ChartNoAxesCombined size={24} color="#FFA66B" />

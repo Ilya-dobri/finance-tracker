@@ -29,13 +29,14 @@ export async function GET(req: NextRequest) {
         
       },
       include: {
-        accounts: {
-          where:{
-            provider: {
-              not: 'monobank'
-            }
-          }
-        },
+        accounts: true
+          // where:{
+          //   provider: {
+          //     not: 'monobank'
+          //   }
+          // }
+          
+        
       },
     });
 

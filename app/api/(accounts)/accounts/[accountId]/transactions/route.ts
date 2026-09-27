@@ -102,8 +102,9 @@ export async function POST(
   if (existingTransaction) {
     return NextResponse.json(existingTransaction, { status: 200 });
   }
-  const transaction = await prisma.transaction.create({
-    data: {
+  const [transaction, updatedAccount] = await prisma.$transaction([
+   prisma.transaction.create({
+ data: {
       amount,
       type,
       description,
@@ -117,7 +118,26 @@ export async function POST(
 
       dedupeHash,
     },
-  });
-
-  return NextResponse.json(transaction, { status: 201 });
+   }),
+   
+    prisma.account.update({
+    where:{
+      id: account.id
+    },
+    data: {
+       balance: {
+      increment: amount,
+    },
+    }
+  })
+  ]);
+ 
+ return NextResponse.json(
+  {
+    transaction,
+    balance: updatedAccount.balance,
+  },
+  { status: 201 },
+);
 }
+
