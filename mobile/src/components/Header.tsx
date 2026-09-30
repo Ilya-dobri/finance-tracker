@@ -6,24 +6,15 @@ import { useEffect, useState } from "react";
 import { API_URL } from "@/app/auth/login";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserAccount } from "@/types/type";
+import { useAccountStore } from "./store/useStatementStore";
 
 
 const Header = () => {
-  const [userData, setUserData] = useState<UserAccount | null>(null);
+ 
+  const getUserData = useAccountStore((state) => state.getUserData)
+  const userData = useAccountStore((state) => state.userData)
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = await AsyncStorage.getItem("session_token");
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      console.log("User data:", data);
-      setUserData(data.user);
-    };
-
-    fetchUserData();
+    getUserData()
   }, []);
 
   return (

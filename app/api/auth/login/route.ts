@@ -37,7 +37,13 @@ export async function POST(req: NextRequest) {
 
     const token = randomBytes(32).toString('hex');
 
-
+await prisma.session.deleteMany({
+  where: {
+    expiresAt: {
+      lte: new Date(),
+    },
+  },
+});
   await prisma.session.create({
     data: {
       token,

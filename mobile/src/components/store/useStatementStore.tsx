@@ -22,6 +22,45 @@ function isSameStatement(a: MonoStatement[], b: MonoStatement[]) {
   return true;
 }
 
+interface categories {
+  id: string,
+  name:string,
+  type: string 
+}
+interface StoreCategoreies {
+  categories: categories[],
+  isLoading: boolean
+  getCategories:  () => void;
+}
+export const useCategoriesStore = create<StoreCategoreies>((set,get) => ({
+  categories: [],
+  isLoading: false,
+
+  async getCategories(){
+    const token = await AsyncStorage.getItem("session_token");
+    if(!token)return
+    try {
+      const response = await fetch(
+        `${API_URL}/api/categories`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (!response.ok) {
+        console.error("Statement error:", response.status);
+        return;
+      }
+       const data = await response.json();
+      set({ categories: data });
+    } catch (error) {
+      console.error("Fetch error:", error);
+    
+    }
+  }
+
+}))
+
+
 export const useStatementStore = create<Store>((set, get) => ({
   state: "",
   statementMono: [],
@@ -89,7 +128,17 @@ export const useStatementStore = create<Store>((set, get) => ({
     }
   },
 }));
-
+export interface UserAccount {
+  id: string;
+  name: string;
+  login: string;
+  email: string;
+  type: string;
+  currency: string;
+  avatar_url: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 interface AccountStore {
   monoData: any;
   isLoading: boolean;
@@ -99,6 +148,8 @@ interface AccountStore {
   selectedAccountId: any;
   bankData: BankAccount[] | null;
   deleteCartOutBank: (deleteId: string) => void;
+  userData: UserAccount | null
+  getUserData: () => void
 }
 
 export const useAccountStore = create<AccountStore>((set, get) => ({
@@ -106,6 +157,7 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
   bankData: [],
   isLoading: false,
   selectedAccountId: null,
+  userData: null,
   fetchMonobank: async () => {
     if (get().isLoading ) return;
     const token = await AsyncStorage.getItem("session_token");
@@ -191,4 +243,38 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
     }
     
   },
+ getUserData: async () => {
+  try {
+    const token = await AsyncStorage.getItem("session_token");
+
+    if (!token) {
+      console.log("Токен отсутствует!");
+      return;
+    }
+
+    const response = await fetch(`${API_URL}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("STATUS:", response.status);
+
+    const data = await response.json();
+
+    console.log("USER DATA:", data);
+
+    if (!response.ok) {
+      console.error("Ошибка получения пользователя:", data);
+      return;
+    }
+
+    set({ userData: data.user });
+  } catch (error) {
+    console.error("Ошибка getUserData:", error);
+  }
+},
 }));
+
+

@@ -163,14 +163,14 @@ const fetchMonobank = useAccountStore(
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // ← обязательно, иначе 401
+            Authorization: `Bearer ${token}`, 
           },
           
           body: JSON.stringify({
-            name: bank, // раньше было "bank"
-            provider: bank, // "monobank" / "privatbank"
-            currency: "UAH", // или что там нужно по схеме
-            
+            name: bank, 
+            provider: bank, 
+            currency: "UAH", 
+            last4: last4,
             displayNumber: cardNumber,
             bankAccountId: last4,
             displayExpiry: cvv

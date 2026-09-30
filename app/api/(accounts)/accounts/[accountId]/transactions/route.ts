@@ -114,7 +114,7 @@ export async function POST(
       userId: session.userId,
       accountId: account.id,
 
-      categoryId: categoryId || null,
+      categoryId,
 
       dedupeHash,
     },

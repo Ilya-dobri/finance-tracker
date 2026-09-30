@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   View,
@@ -34,6 +34,7 @@ import { getBankTransactionIcon } from "./getBankTransactionImage";
 import Header from "./Header";
 import { router } from "expo-router";
 import MenuAddTrans from "./MenuAddTrans";
+
 export type MonoAccountsResponse = MonoData | MonoAccount[];
 export type CardProps = MonoCardProps | OtherCardProps;
 
@@ -52,6 +53,7 @@ const AccountUser: React.FC = () => {
   const monoDataFromStore = useAccountStore((state) => state.monoData);
   const fetchOtherBank = useAccountStore((state) => state.fetchOtherBank);
   const BankOtherDataFromStore = useAccountStore((state) => state.bankData);
+  
   const setSelectedAccountId = useAccountStore(
     (state) => state.setSelectedAccountId,
   );
@@ -69,7 +71,9 @@ const AccountUser: React.FC = () => {
     fetchMonobank();
     fetchOtherBank();
   }, []);
-
+const handleClose = useCallback(() => {
+  menuRef.current?.dismiss();
+}, []);
   const refreshData = async () => {
     if (refreshing) return;
 
@@ -106,7 +110,7 @@ const AccountUser: React.FC = () => {
 
     const otherCards =
       BankOtherDataFromStore?.filter((account) => account.provider !== 'monobank').map((account) => ({
-        variant: "BANK-OTHER" as const,
+        variant: "BANK-SUM" as const,
         id: account.id,
         balance: Number(account.balance),
         provider: account.provider,
@@ -150,8 +154,9 @@ const AccountUser: React.FC = () => {
 
       return;
     }
+     await getCardStatementBank(activeCard.id);
     await syncNotifications(activeCard.id);
-    await getCardStatementBank(activeCard.id);
+   
   };
 
   const groupedTransactions = useMemo(() => {
@@ -284,7 +289,8 @@ const AccountUser: React.FC = () => {
 
                 return (
                   <MonoCarta
-                    variant="BANK-OTHER"
+                    variant="BANK-SUM"
+                    
                     balance={item.balance}
                     provider={item.provider}
                     currency={item.currency}
@@ -567,7 +573,7 @@ const AccountUser: React.FC = () => {
         ref={cardMenuRef}
       />
 
-      <MenuAddTrans ref={menuRef} onClose={() => menuRef.current?.dismiss()} />
+      <MenuAddTrans  ref={menuRef} onClose={handleClose} />
     </View>
   );
 };
