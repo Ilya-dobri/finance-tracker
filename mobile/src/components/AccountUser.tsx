@@ -59,9 +59,10 @@ const AccountUser: React.FC = () => {
   );
   const selectedAccountId = useAccountStore((state) => state.selectedAccountId);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
-  const [activeCardVariant, setActiveCardVariant] = useState<"MONOBANK_SUM" | "OTHER">(
-    "MONOBANK_SUM",
-  );
+  const {activeCardVariant, setActiveCardVariant} = useAccountStore((state) => ({
+    activeCardVariant: state.activeCardVariant,
+    setActiveCardVariant: state.setActiveCardVariant,
+  }));
   const [isActiveTransactionPanel, setIsActiveTransactionPanel] =
     useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -145,7 +146,7 @@ const handleClose = useCallback(() => {
     const activeCard = cards[index];
 
     if (!activeCard) return;
-
+    
     setActiveCardVariant(activeCard.variant);
     setActiveCardId(activeCard.id);
     setSelectedAccountId(activeCard.id);
@@ -161,7 +162,7 @@ const handleClose = useCallback(() => {
 
   const groupedTransactions = useMemo(() => {
     const groupsOther = new Map<string, typeof statementBankAnt>();
-
+    
     statementBankAnt.forEach((item) => {
       if (!item.date) return;
       const date = new Date(item.date);
@@ -187,7 +188,7 @@ const handleClose = useCallback(() => {
     }));
   }, [statementBankAnt]);
 
-  const groupedMonoTransactions = useMemo(() => {
+   const groupedMonoTransactions = useMemo(() => {
     const groups = new Map<string, typeof statementData>();
 
     statementData.forEach((item) => {

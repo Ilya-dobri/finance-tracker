@@ -138,6 +138,7 @@ export interface UserAccount {
   avatar_url: string | null;
   createdAt: string;
   updatedAt: string;
+  password: any
 }
 interface AccountStore {
   monoData: any;
@@ -146,6 +147,8 @@ interface AccountStore {
   fetchOtherBank: () => void;
   setSelectedAccountId: (id: string) => void;
   selectedAccountId: any;
+  activeCardVariant: string;
+  setActiveCardVariant: (variant: string) => void;
   bankData: BankAccount[] | null;
   deleteCartOutBank: (deleteId: string) => void;
   userData: UserAccount | null
@@ -158,6 +161,8 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
   isLoading: false,
   selectedAccountId: null,
   userData: null,
+  activeCardVariant: "MONOBANK_SUM",
+  setActiveCardVariant: (variant) => set({ activeCardVariant: variant }),
   fetchMonobank: async () => {
     if (get().isLoading ) return;
     const token = await AsyncStorage.getItem("session_token");

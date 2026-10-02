@@ -23,6 +23,9 @@ const Settings = () => {
 
 const [menuVariant, setMenuVariant] =
   useState<SettingVariant | null>(null);
+  useEffect(( ) => {
+    getUserData()
+  },[])
   const openSettingMenu = (variant?: SettingVariant) => {
   if (!variant) return;
 
@@ -64,7 +67,7 @@ if (Platform.OS === "web") {
 
   formData.append("avatar", selectedAvatar.file);
 } else {
-  // Для Android и iOS
+  
   formData.append("avatar", {
     uri: selectedAvatar.uri,
     name: selectedAvatar.name,
@@ -73,7 +76,7 @@ if (Platform.OS === "web") {
 }
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
+      const response = await fetch(`${API_URL}/api/auth/me/avatar`, {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
