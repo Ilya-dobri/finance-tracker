@@ -41,9 +41,9 @@ export default function SpendingChart({
 
       return (
         tx.accountId === accountId &&
-        tx.amount < 0 &&
+        tx.amount !== 0  &&
         date.getFullYear() === year &&
-        date.getMonth() === month
+        date.getMonth() === month 
       );
     });
   }, [transactions, accountId, year, month]);

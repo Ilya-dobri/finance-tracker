@@ -15,6 +15,7 @@ import { QuickActionsMenu } from "./QuickActionsMenu";
 import { CreditCardIcon, X } from "lucide-react-native";
 
 import MenuAddCard from "./MenuAddCard";
+import { useShallow } from "zustand/shallow";
 
 import {
   MonoAccount,
@@ -59,10 +60,12 @@ const AccountUser: React.FC = () => {
   );
   const selectedAccountId = useAccountStore((state) => state.selectedAccountId);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
-  const {activeCardVariant, setActiveCardVariant} = useAccountStore((state) => ({
-    activeCardVariant: state.activeCardVariant,
-    setActiveCardVariant: state.setActiveCardVariant,
-  }));
+  const { activeCardVariant, setActiveCardVariant } = useAccountStore(
+    useShallow((state) => ({
+      activeCardVariant: state.activeCardVariant,
+      setActiveCardVariant: state.setActiveCardVariant,
+    })),
+  );
   const [isActiveTransactionPanel, setIsActiveTransactionPanel] =
     useState(false);
   const [refreshing, setRefreshing] = useState(false);

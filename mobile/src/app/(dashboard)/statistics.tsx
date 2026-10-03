@@ -6,6 +6,8 @@ import { MonoAccount } from '@/types/type';
 import { CreditCardIcon, X } from 'lucide-react-native';
 import React, { memo, useMemo, useState } from 'react'
 import { Text, View } from 'react-native'
+import monoCarta from '../../img/monoCarta.png';
+import PrivatCard from '@/assets/privatbank-card-minimal.svg'
 import {
 
   Pressable,
@@ -23,99 +25,144 @@ const statistics = memo(() => {
   const statementData = useStatementStore((state) => state.statementMono);
   const statementBankAnt = useStatementStore((state) => state.statementBank);
 const [selectedDay, setSelectedDay] = useState<number | null>(null);
-const filteredTransactions = useMemo(() => {
-  if (selectedDay === null) {
-    return statementData || statementBankAnt;
+  const bank = useAccountStore((state) => state.bankData);
+ const isMono = activeCardVariant === "MONOBANK_SUM";
+const transactions = useMemo(() => {
+  if (isMono) {
+    return (statementData ?? []).map((item) => ({
+      id: String(item.id),
+      title: item.description ?? "",
+      description: item.description ?? "",
+      accountId: selectAccount ?? "",
+      amount: Number(item.amount ?? 0) / 100,
+      date: new Date(item.time * 1000).toISOString(),
+      time: Number(item.time ?? 0),
+      type: "",
+      isMono: true,
+    }));
   }
-  
+
+  return (statementBankAnt ?? []).map((item) => ({
+    id: String(item.id),
+    title: item.description ?? "",
+    description: item.description ?? "",
+    accountId: selectAccount ?? "",
+    amount: Number(item.amount ?? 0),
+    date: item.date ? String(item.date) : "",
+    time: item.date ? new Date(item.date).getTime() / 1000 : 0,
+    type: item.type ?? "",
+    isMono: false,
+  }));
+}, [isMono, statementData, statementBankAnt, selectAccount]);
+const filteredTransactions = useMemo(() => {
+ 
+
 
   const now = new Date();
+   return transactions.filter((item) => {
+    if (!item.date) return false;
 
-  return statementData.filter((item) => {
-    const date = new Date(item.time * 1000);
+    const date = new Date(item.date);
+
+    if (Number.isNaN(date.getTime())) {
+      return false;
+    }
+
+    const isCurrentMonth =
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth();
+
+    if (!isCurrentMonth) return false;
+
+    if (selectedDay === null) {
+      return true;
+    }
 
     return (
-      Number(item.amount) < 0 &&
       date.getDate() === selectedDay &&
-      date.getMonth() === now.getMonth() &&
-      date.getFullYear() === now.getFullYear()
+      item.amount !== 0
     );
   });
+}, [  transactions, selectedDay]);
 
-}, [statementData, selectedDay]);
-    const chartTransactions = useMemo(
-      () =>
-        statementData.map((item) => ({
-          ...item,
-          title: item.description ?? "",
-          accountId: selectAccount ?? "",
-          date: new Date(item.time * 1000).toISOString(),
-        })),
-      [statementData, selectAccount],
-    );
+const selectedCard = bank?.find(
+  (card) => card.id === selectAccount
+);
 
+const selectedMonoCard = monoDataFromStore?.accounts?.find(
+  (card: MonoAccount) => card.id === selectAccount
+);
 
-    const groupedMonoTransactions = useMemo(() => {
-        const groups = new Map<string, typeof statementData>();
+    const groupedTransactions = useMemo(() => {
+  const groups = new Map<
+    string,
+    typeof filteredTransactions
+  >();
+      filteredTransactions.forEach((item) => {
+        const date = new Date(item.date);
+       const key = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+    const transactions = groups.get(key) ?? [];
+    transactions.push(item);
+    groups.set(key, transactions);
+
+      })
+  return Array.from(groups, ([date, data]) => ({
+    title: new Date(`${date}T12:00:00`).toLocaleDateString(
+      "ru-RU",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    ),
+    data,
+  }));
+},[filteredTransactions]);
     
-        filteredTransactions.forEach((item) => {
-          const date = new Date(item.time * 1000);
-          const key = [
-            date.getFullYear(),
-            String(date.getMonth() + 1).padStart(2, "0"),
-    
-            String(date.getDate()).padStart(2, "0"),
-          ].join("-");
-          const transactions = groups.get(key) ?? [];
-          transactions.push(item);
-          groups.set(key, transactions);
-        },[filteredTransactions]);
-    
-        return Array.from(groups, ([date, data]) => ({
-          title: new Date(`${date}T12:00:00`).toLocaleDateString("ru-RU", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          }),
-    
-          data,
-        }));
-      }, [statementData, filteredTransactions]);
+        
       
-        const groupedTransactions = useMemo(() => {
-          const groupsOther = new Map<string, typeof statementBankAnt>();
-          
-          statementBankAnt.forEach((item) => {
-            if (!item.date) return;
-            const date = new Date(item.date);
-            const key = [
-              date.getFullYear(),
-              String(date.getMonth() + 1).padStart(2, "0"),
-      
-              String(date.getDate()).padStart(2, "0"),
-            ].join("-");
-            const transactions = groupsOther.get(key) ?? [];
-            transactions.push(item);
-            groupsOther.set(key, transactions);
-          });
-      
-          return Array.from(groupsOther, ([date, data]) => ({
-            title: new Date(`${date}T12:00:00`).toLocaleDateString("ru-RU", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            }),
-      
-            data,
-          }));
-        }, [statementBankAnt]);
+
   return (
-    <View>
+    <View className='w-full'>
       <View className='w-full mt-10 flex items-center h-10 mt-5 justify-center'>
         <Text className='text-white text-[20px] font-semibold'>Statistics</Text></View>
-       <View className='w-full mt-20 flex items-center h-10  justify-center'>
+       <View className='mt-20 flex items-center h-10  justify-center'>
          <Text className='text-gray-600 text-2xl font-semibold'>Current Balance</Text>
-        <Text> {activeCardVariant === "MONOBANK_SUM"? '123' : '222'}</Text>
+        
+           {activeCardVariant === "MONOBANK_SUM"? 
+        
+        
+       <View className="w-[60%] gap-5 h-10 bg-[#1E1E2D] flex-row items-center justify-center gap-2 rounded-2xl">
+
+  <View className="relative w-12 h-8 overflow-hidden">
+    <img
+      src={monoCarta}
+      className="absolute w-[130px] h-[80px] max-w-none left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+      alt="Mono Card"
+    />
+  </View>
+
+  <Text className="text-white">
+    {selectedMonoCard?.maskedPan?.[0] ?? "Нет номера"}
+  </Text>
+
+</View>
+       
+        : <View>
+             <PrivatCard
+      width={130}
+      height={80}
+      style={{ position: 'absolute', left: '50%', top: '50%', transform: [{ translateX: -65 }, { translateY: -40 }] }}
+    />
+           <Text className="text-white">
+    {selectedMonoCard?.maskedPan?.[0] ?? "Нет номера"}
+  </Text>
+  
+  </View>}
   {monoDataFromStore?.accounts?.map((account: MonoAccount) => {
           if ( account.id !== selectAccount) {
             return null;
@@ -131,7 +178,7 @@ const filteredTransactions = useMemo(() => {
 
        <View className=' mt-10 flex items-center   justify-center'>
         <SpendingChart
-  transactions={chartTransactions}
+  transactions={transactions}
   accountId={selectAccount ?? ""}
   selectedDay={selectedDay}
   onSelectDay={(day) => {
@@ -182,7 +229,7 @@ const filteredTransactions = useMemo(() => {
                   style={{
                     flex: 1,
                   }}
-                  sections={groupedMonoTransactions}
+                  sections={groupedTransactions}
                   keyExtractor={(item) => item.id}
                   showsVerticalScrollIndicator={false}
                   contentContainerStyle={{
@@ -191,7 +238,7 @@ const filteredTransactions = useMemo(() => {
                   }}
                   renderItem={({ item }) => {
                     const logoUrl = getLogoForTx(item.description ?? "");
-
+                    
                     return (
                       <View className="h-[55px] flex-row justify-between items-center p-[5px]">
                         <View className="flex-row items-center gap-[17px] flex-1">
@@ -216,7 +263,7 @@ const filteredTransactions = useMemo(() => {
                             </Text>
 
                             <Text className="text-gray-400 text-xs">
-                              {new Date(item.time * 1000).toLocaleTimeString(
+                              {new Date(item.time * 100).toLocaleTimeString(
                                 "ru-RU",
                                 {
                                   hour: "2-digit",
@@ -228,7 +275,7 @@ const filteredTransactions = useMemo(() => {
                         </View>
 
                         <Text className="text-white">
-                          {Number(item.amount ?? 0) / 100} ₴
+                         {item.amount.toFixed(2)} ₴
                         </Text>
                       </View>
                     );
@@ -287,7 +334,7 @@ const filteredTransactions = useMemo(() => {
                         </View>
 
                         <Text className="text-white">
-                          {Number(item.amount)} ₴
+                          {Number(item.amount ) } ₴
                         </Text>
                       </View>
                     );
@@ -346,12 +393,12 @@ const filteredTransactions = useMemo(() => {
                           </View>
 
                           <Text className="text-white">
-                            {Number(item.amount ?? 0) / 100}₴
+                           {item.amount.toFixed(2)} ₴
                           </Text>
                         </View>
                       );
                     })
-                  : statementBankAnt.slice(0, 4).map((item) => {
+                  : filteredTransactions.slice(0, 4).map((item) => {
                       const icon = getBankTransactionIcon({
                         description: item.description ?? "",
 
