@@ -66,7 +66,6 @@
     "sharp": "^0.35.5",
     "tailwind-merge": "^3.6.0",
     "tailwind-variants": "^0.1.20",
-    "undefined": "expo-image-picker\\",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

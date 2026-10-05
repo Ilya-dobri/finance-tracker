@@ -2,16 +2,24 @@ import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BankAccount, MonoStatement } from "@/types/type";
 import { API_URL } from "@/app/auth/login";
-import { MonoAccountsResponse } from "../AccountUser";
+
+type MonoAccountsResponse = { accounts?: unknown[] } | unknown[];
 
 interface Store {
   state: string;
   isLoading: boolean;
   setState: (state: string) => void;
   statementMono: MonoStatement[];
+  monoCache: Record<string, MonoStatement[]>;
   statementBank: BankAccount[];
+  bankCache: Record<string, BankAccount[]>;
+  activeMonoAccountId: string | null;
   lastAccountId: string | null;
-  getCardStatementMono: (accountId: string) => Promise<void>;
+  activeBankAccountId: string | null;
+   getCardStatementMono: (
+    accountId: string,
+    force?: boolean
+  ) => Promise<void>;
   getCartAnotherBankStatement: (accountId: string) => Promise<void>;
 }
 function isSameStatement(a: MonoStatement[], b: MonoStatement[]) {
@@ -59,20 +67,46 @@ export const useCategoriesStore = create<StoreCategoreies>((set,get) => ({
   }
 
 }))
+const pendingMonoRequests =
+  new Map<string, Promise<void>>();
 
-
+const pendingBankRequests =
+  new Map<string, Promise<void>>();
 export const useStatementStore = create<Store>((set, get) => ({
   state: "",
   statementMono: [],
   statementBank: [],
   isLoading: false,
   lastAccountId: null,
+  monoCache: {},
+  bankCache: {},
+  activeMonoAccountId: null,
+  activeBankAccountId: null,
   setState: (state) => set({ state }),
 
-  async getCardStatementMono(accountId: string) {
-    if (!accountId || get().isLoading) return;
-    if (get().lastAccountId === accountId && get().statementMono.length > 0)
-      return;
+  async getCardStatementMono(accountId: string, force?: boolean) {
+    if (!accountId) return;
+
+  const state = get();
+  const cached = state.monoCache[accountId];
+
+     if (state.activeMonoAccountId !== accountId) {
+    set({
+      activeMonoAccountId: accountId,
+      statementMono: cached ?? [],
+      lastAccountId:
+        cached !== undefined ? accountId : null,
+    });
+  }
+    if (!force && cached !== undefined) {
+    console.log("MONO: данные взяты из кеша");
+    return;
+  }
+  const pending = pendingMonoRequests.get(accountId);
+
+  if (pending) {
+    return pending;
+  }
     const token = await AsyncStorage.getItem("session_token");
     if (!token || !accountId) return;
 
@@ -101,7 +135,28 @@ export const useStatementStore = create<Store>((set, get) => ({
     }
   },
 
-  getCartAnotherBankStatement: async (accountId: string) => {
+  getCartAnotherBankStatement: async (accountId: string, force?: boolean) => {
+    if (!accountId) return;
+    const state = get()
+    const cached = state.bankCache[accountId];
+    if(state.activeBankAccountId !== accountId){
+      set({
+        activeBankAccountId: accountId,
+        statementBank: cached ?? [],
+        lastAccountId: cached !== undefined ? accountId : null,
+      })
+    
+    }
+ if (!force && cached !== undefined) {
+    console.log("MONO: данные взяты из кеша");
+    return;
+  }
+  
+
+    const pending = pendingBankRequests.get(accountId)
+    if(pending){
+      return pending
+    }
     const token = await AsyncStorage.getItem("session_token");
     if (!token) return;
     try {
@@ -118,7 +173,7 @@ export const useStatementStore = create<Store>((set, get) => ({
         throw new Error(`Ошибка: ${response.status}`);
       }
       const data: BankAccount[] = await response.json();
-      set({ statementBank: data });
+      set((current) => ({bankCache: {...current.bankCache, [accountId]: data}, ...(current.activeBankAccountId === accountId ? { statementBank: data } : {}) } ) );
     } catch (error) {
       console.error(error);
 

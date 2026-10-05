@@ -48,6 +48,7 @@ const AccountUser: React.FC = () => {
   const getCardStatementBank = useStatementStore(
     (state) => state.getCartAnotherBankStatement,
   );
+
   const statementData = useStatementStore((state) => state.statementMono);
   const statementBankAnt = useStatementStore((state) => state.statementBank);
   const fetchMonobank = useAccountStore((state) => state.fetchMonobank);
@@ -71,7 +72,7 @@ const AccountUser: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const { width: PAGE_WIDTH } = Dimensions.get("window");
 
-  useEffect(() => {
+  useMemo(() => {
     fetchMonobank();
     fetchOtherBank();
   }, []);
@@ -126,24 +127,6 @@ const handleClose = useCallback(() => {
     return [...monoCards, ...otherCards];
   }, [monoDataFromStore, BankOtherDataFromStore]);
 
-  useEffect(() => {
-    const monoAccountId = monoDataFromStore?.accounts?.[0]?.id;
-
-    const otherAccountId = BankOtherDataFromStore?.[0]?.id;
-
-    if (monoAccountId) {
-      getCardStatement(monoAccountId);
-    }
-
-    if (otherAccountId) {
-      getCardStatementBank(otherAccountId);
-    }
-  }, [
-    monoDataFromStore,
-    BankOtherDataFromStore,
-    getCardStatement,
-    getCardStatementBank,
-  ]);
 
   const handleCardChange = async (index: number) => {
     const activeCard = cards[index];
@@ -227,7 +210,9 @@ const handleClose = useCallback(() => {
       return;
     }
 
-    const firstCard = cards[0];
+   if (activeCardId !== null) return;
+
+    const firstCard = cards.find((card) => card.id === selectedAccountId) ?? cards[0];
 
     setActiveCardId(firstCard.id);
     setActiveCardVariant(firstCard.variant);

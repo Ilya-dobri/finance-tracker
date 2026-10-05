@@ -1,5 +1,5 @@
 
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import { Search } from "lucide-react-native";
 import avatar from '../img/logo_profile.jpg'
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import { useAccountStore } from "./store/useStatementStore";
 
 
 const Header = () => {
- 
+   const [openSerch, setOpenSearch] = useState(false); 
   const getUserData = useAccountStore((state) => state.getUserData)
   const userData = useAccountStore((state) => state.userData)
   useEffect(() => {
@@ -41,10 +41,10 @@ const Header = () => {
           </View>
 
           {/* Кнопка поиска */}
-          <View className="w-[42px] h-[42px] flex-row items-center justify-center bg-[#1E1E2D] rounded-full">
+          <Pressable onPress={() => setOpenSearch(true)} className="w-[42px] h-[42px] flex-row items-center justify-center bg-[#1E1E2D] rounded-full">
             <Search size={20} color="white" />
-          </View>
-
+          </Pressable>
+          
         </View>
       </View>
     </View>

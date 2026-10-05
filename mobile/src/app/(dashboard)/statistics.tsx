@@ -2,10 +2,10 @@ import { getBankTransactionIcon } from '@/components/getBankTransactionImage';
 import { getLogoForTx } from '@/components/getIconForTx';
 import SpendingChart from '@/components/SpendingChart';
 import { useAccountStore, useStatementStore } from '@/components/store/useStatementStore'
-import { MonoAccount } from '@/types/type';
+import { BankAccount, MonoAccount } from '@/types/type';
 import { CreditCardIcon, X } from 'lucide-react-native';
 import React, { memo, useMemo, useState } from 'react'
-import { Text, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 import monoCarta from '../../img/monoCarta.png';
 import PrivatCard from '@/assets/privatbank-card-minimal.svg'
 import {
@@ -20,6 +20,7 @@ const statistics = memo(() => {
   const [isActiveTransactionPanel, setIsActiveTransactionPanel] =
       useState(false);
   const monoDataFromStore = useAccountStore((state) => state.monoData);
+  const bankDataFromStore = useAccountStore((state) => state.bankData);
   const selectAccount = useAccountStore((state) => state.selectedAccountId);
   const activeCardVariant = useAccountStore((state) => state.activeCardVariant);
   const statementData = useStatementStore((state) => state.statementMono);
@@ -92,6 +93,9 @@ const selectedCard = bank?.find(
 const selectedMonoCard = monoDataFromStore?.accounts?.find(
   (card: MonoAccount) => card.id === selectAccount
 );
+const selectBankCard = bankDataFromStore?.find(
+  (card: BankAccount) => card.id === selectAccount
+);
 
     const groupedTransactions = useMemo(() => {
   const groups = new Map<
@@ -139,11 +143,19 @@ const selectedMonoCard = monoDataFromStore?.accounts?.find(
        <View className="w-[60%] gap-5 h-10 bg-[#1E1E2D] flex-row items-center justify-center gap-2 rounded-2xl">
 
   <View className="relative w-12 h-8 overflow-hidden">
-    <img
-      src={monoCarta}
-      className="absolute w-[130px] h-[80px] max-w-none left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-      alt="Mono Card"
-    />
+     <Image
+    source={monoCarta}
+    accessibilityLabel="Mono Card"
+    resizeMode="stretch"
+    style={{
+      position: "absolute",
+      width: 130,
+      height: 80,
+      left: "50%",
+      top: "50%",
+      transform: [{ translateX: -65 }, { translateY: -40 }],
+    }}
+  />
   </View>
 
   <Text className="text-white">
@@ -152,18 +164,22 @@ const selectedMonoCard = monoDataFromStore?.accounts?.find(
 
 </View>
        
-        : <View>
-             <PrivatCard
-      width={130}
-      height={80}
-      style={{ position: 'absolute', left: '50%', top: '50%', transform: [{ translateX: -65 }, { translateY: -40 }] }}
-    />
+        : <View className='w-[60%] gap-5 h-10 bg-[#1E1E2D] flex-row items-center justify-center gap-2 rounded-2xl'>
+                <PrivatCard
+              accessibilityLabel="PrivatBank Card"
+              width={30}
+              height={80}
+              style={{
+      
+      
+    }}
+  />
            <Text className="text-white">
-    {selectedMonoCard?.maskedPan?.[0] ?? "Нет номера"}
+    {selectBankCard?.displayNumber ?? "Нет номера"}
   </Text>
   
   </View>}
-  {monoDataFromStore?.accounts?.map((account: MonoAccount) => {
+ {activeCardVariant === "MONOBANK_SUM" ? ( monoDataFromStore?.accounts?.map((account: MonoAccount) => {
           if ( account.id !== selectAccount) {
             return null;
           }
@@ -173,7 +189,17 @@ const selectedMonoCard = monoDataFromStore?.accounts?.find(
               <Text className='text-white text-lg font-semibold'>{((account.balance ?? 0) / 100).toLocaleString("uk-UA")} ₴</Text>
             </View>
           );
-        })}
+        })) : (bankDataFromStore?.map((account: BankAccount) => {
+          if ( account.id !== selectAccount) {
+            return null;
+          }
+
+          return (
+            <View key={account.id} className='w-full flex items-center h-10  justify-center'>
+              <Text className='text-white text-lg font-semibold'>{(Number(account.balance ?? 0)).toLocaleString("uk-UA")} ₴</Text>
+            </View>
+          );
+        }))}
        </View>
 
        <View className=' mt-10 flex items-center   justify-center'>
