@@ -8,6 +8,7 @@ import {
   Dimensions,
   ScrollView,
   SectionList,
+  Keyboard,
 } from "react-native";
 
 import { QuickActionsMenu } from "./QuickActionsMenu";
@@ -48,7 +49,11 @@ const AccountUser: React.FC = () => {
   const getCardStatementBank = useStatementStore(
     (state) => state.getCartAnotherBankStatement,
   );
-
+  const [openSerch, setOpenSearch] = useState(false); 
+ const CloseMenuSearch = () => {
+    Keyboard.dismiss()
+    setOpenSearch(false)
+  }
   const statementData = useStatementStore((state) => state.statementMono);
   const statementBankAnt = useStatementStore((state) => state.statementBank);
   const fetchMonobank = useAccountStore((state) => state.fetchMonobank);
@@ -72,7 +77,7 @@ const AccountUser: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const { width: PAGE_WIDTH } = Dimensions.get("window");
 
-  useMemo(() => {
+  useEffect(() => {
     fetchMonobank();
     fetchOtherBank();
   }, []);
@@ -225,8 +230,10 @@ const handleClose = useCallback(() => {
   }, [cards]);
 
   return (
-    <View className="relative flex-1">
-      <Header />
+    <View>
+      <Header statementBankAnt={statementBankAnt} statementData={statementData} openSerch={openSerch} setOpenSearch={() => setOpenSearch(!openSerch)} />
+    <Pressable onPress={CloseMenuSearch} className="relative flex-1">
+      
 
       {monoDataFromStore?.accounts?.length === 0 &&
       BankOtherDataFromStore?.length === 0 ? (
@@ -563,7 +570,9 @@ const handleClose = useCallback(() => {
       />
 
       <MenuAddTrans  ref={menuRef} onClose={handleClose} />
+    </Pressable>
     </View>
+
   );
 };
 
